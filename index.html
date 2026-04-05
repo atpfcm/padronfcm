@@ -3,127 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Buscador de Padrones - Elecciones</title>
+    <title>Buscador de Padrones - ATP</title>
     <style>
-        :root { --bg: #f8fafc; --primary: #0284c7; --card: #ffffff; --text: #1e293b; --accent: #e0f2fe; }
+        /* Definición de colores ATP y variables */
+        :root { 
+            --bg: #f4f6f9; 
+            --atp-blue: #2e5699; /* Azul Principal */
+            --atp-pink: #f969d7; /* Rosa Acento */
+            --card: #ffffff; 
+            --text: #1a202c; 
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
         * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background-color: var(--bg); color: var(--text); margin: 0; padding: 1.5rem 1rem; display: flex; justify-content: center; }
-        .container { max-width: 500px; width: 100%; }
-        h1 { text-align: center; color: var(--primary); font-size: 1.5rem; margin-top: 0; margin-bottom: 0.5rem; }
-        .subtitle { text-align: center; color: #64748b; font-size: 0.9rem; margin-bottom: 1.5rem; }
-        .search-box { width: 100%; padding: 1rem; font-size: 1.1rem; border: 2px solid #cbd5e1; border-radius: 0.75rem; outline: none; margin-bottom: 1.5rem; transition: border-color 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-        .search-box:focus { border-color: var(--primary); }
-        .card { background: var(--card); padding: 1.25rem; border-radius: 0.75rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 1rem; border-left: 5px solid var(--primary); }
-        .card h2 { margin: 0 0 0.5rem 0; font-size: 1.15rem; }
-        .card p { margin: 0.25rem 0; color: #475569; font-size: 0.95rem; }
-        .mesa-badge { display: inline-block; background: var(--primary); color: white; padding: 0.4rem 0.8rem; border-radius: 0.5rem; font-weight: 700; font-size: 1.1rem; margin-top: 0.75rem; }
-        .empty { text-align: center; color: #64748b; margin-top: 2rem; background: var(--accent); padding: 1rem; border-radius: 0.75rem;}
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>🗳️ ¿Dónde voto?</h1>
-        <div class="subtitle">Ingresá tu DNI (sin puntos) o Apellido</div>
         
-        <input type="text" id="buscador" class="search-box" placeholder="Ej: 40123456 o Perez..." autocomplete="off">
+        body { background-color: var(--bg); color: var(--text); margin: 0; padding: 1rem; display: flex; justify-content: center; }
         
-        <div id="resultados">
-            <div class="empty">Escribí al menos 3 caracteres para buscar.</div>
-        </div>
-    </div>
+        .container { max-width: 480px; width: 100%; display: flex; flex-direction: column; align-items: center; }
 
-    <script src="datos.js"></script>
+        /* Estilos de la cabecera y Logo */
+        .header { text-align: center; margin-bottom: 1.5rem; width: 100%; }
+        .logo-atp { max-width: 180px; height: auto; margin-bottom: 1rem; }
+        
+        h1 { text-align: center; color: var(--atp-blue); font-size: 1.6rem; margin: 0 0 0.5rem 0; font-weight: 800; }
+        .subtitle { text-align: center; color: #718096; font-size: 0.95rem; margin-bottom: 1.5rem; max-width: 80%; }
 
-    <script>
-        const buscador = document.getElementById('buscador');
-        const resultados = document.getElementById('resultados');
+        /* Buscador */
+        .search-box { width: 100%; padding: 1.1rem; font-size: 1.1rem; border: 2px solid #e2e8f0; border-radius: 1rem; outline: none; margin-bottom: 1rem; transition: all 0.2s; box-shadow: inset 0 1px 2px rgba(0,0,0,0.05); }
+        .search-box:focus { border-color: var(--atp-pink); box-shadow: 0 0 0 3px rgba(249, 105, 215, 0.2); }
 
-        // Verificamos si se cargó el archivo datos.js
-        if (typeof padron === 'undefined') {
-            resultados.innerHTML = '<div class="card" style="border-left-color: #ef4444;"><p><b>Error de sistema:</b> No se encontró el archivo <code>datos.js</code> con el padrón.</p></div>';
-        }
+        /* Flyer y Link de propuestas */
+        .flyer-atp { width: 100%; height: auto; border-radius: 1rem; box-shadow: var(--shadow); margin-bottom: 1rem; display: block; }
+        
+        .link-propuestas { display: block; text-align: center; color: var(--atp-pink); font-weight: 700; text-decoration: none; margin-bottom: 2rem; font-size: 1.1rem; transition: color 0.2s; padding: 0.5rem; border-radius: 0.5rem;}
+        .link-propuestas:hover { color: #d64cb2; background-color: rgba(249, 105, 215, 0.1); }
 
-        // Función para normalizar texto (quita tildes y pasa a minúscula para que la comparación sea exacta)
-        function normalizar(str) {
-            return str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
-        }
-
-        // Cortes de mesa (usamos el límite SUPERIOR de cada mesa para máxima exactitud)
-        const cortes = {
-            "MEDICINA": [
-                { mesa: 1, fin: "Benavides, Melani Ayelen" },
-                { mesa: 2, fin: "Challco Achahui, Cristian Nahuel" },
-                { mesa: 3, fin: "De Souza Lopes, Dejandeson Alex" },
-                { mesa: 4, fin: "Gambini, Victoria" },
-                { mesa: 5, fin: "Juncos, Matias Nahuel" },
-                { mesa: 6, fin: "Merlo, Victoria" },
-                { mesa: 7, fin: "Palavecino Paez, Greta" },
-                { mesa: 8, fin: "Rocha De Mello Souza, Julia" },
-                { mesa: 9, fin: "Souza Da Silva, Ana Paula" },
-                { mesa: 10, fin: "ZZZZZZ" } // Atrapa hasta Zurita y cualquier rezagado
-            ],
-            "FONOAUDIOLOGIA": [
-                { mesa: 11, fin: "Laurito Ortiz, Iara" },
-                { mesa: 12, fin: "ZZZZZZ" }
-            ],
-            "ENFERMERIA": [
-                { mesa: 13, fin: "Fernandez, Diana Carina" },
-                { mesa: 14, fin: "Orozco, Amanda Isabel" },
-                { mesa: 15, fin: "ZZZZZZ" }
-            ]
-        };
-
-        // Lógica infalible para determinar mesa
-        function determinarMesa(nombre, escuela) {
-            let n = normalizar(nombre);
-            let esc = normalizar(escuela);
-            
-            let clave = esc.includes("medicina") ? "MEDICINA" :
-                        esc.includes("fonoaudiologia") ? "FONOAUDIOLOGIA" :
-                        esc.includes("enfermeria") ? "ENFERMERIA" : null;
-            
-            if (!clave) return "?";
-
-            let mesas = cortes[clave];
-            for (let m of mesas) {
-                // Se agrega \uFFFF para asegurar que el corte incluya el nombre exacto y sus variantes
-                if (n <= normalizar(m.fin) + "\uFFFF") {
-                    return m.mesa;
-                }
-            }
-            return mesas[mesas.length - 1].mesa; // Fallback por seguridad
-        }
-
-        // Buscador en tiempo real
-        buscador.addEventListener('input', (e) => {
-            if (typeof padron === 'undefined') return;
-            
-            let val = normalizar(e.target.value);
-            if (val.length < 3) {
-                resultados.innerHTML = '<div class="empty">Escribí al menos 3 caracteres...</div>';
-                return;
-            }
-
-            // Busca por DNI o Nombre (máximo 15 resultados para no trabar el celu)
-            let matches = padron.filter(p => normalizar(p.dni).includes(val) || normalizar(p.nombre).includes(val)).slice(0, 15);
-
-            if (matches.length === 0) {
-                resultados.innerHTML = '<div class="empty">No se encontró a nadie en el padrón con esos datos.</div>';
-                return;
-            }
-
-            resultados.innerHTML = matches.map(p => {
-                let mesa = determinarMesa(p.nombre, p.escuela);
-                return `
-                    <div class="card">
-                        <h2>${p.nombre}</h2>
-                        <p><b>DNI:</b> ${p.dni}</p>
-                        <p><b>Carrera:</b> ${p.escuela}</p>
-                        <div class="mesa-badge">MESA ${mesa}</div>
-                    </div>
-                `;
-            }).join('');
-        });
-    </script>
-</body>
-</html>
+        /* Tarjetas de Resultado */
+        .card { background: var(--card); padding: 1.5rem; border-radius: 1rem; box-shadow: var(--shadow); margin-bottom: 1.25rem; border-left: 6px solid var(--atp-blue); width: 100%; transition: transform 0.2s; }
+        .card:hover { transform: translateY(-2px); }
+        .card h2 { margin: 0 0 0.75rem 0; font-size: 1.2rem; color: var(--atp-blue); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;}
+        .card p { margin: 0.4rem 0; color: #4a
